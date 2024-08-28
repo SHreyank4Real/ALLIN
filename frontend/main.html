@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB FastAPI UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .data-container {
+            margin-top: 20px;
+        }
+        .data-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>MongoDB FastAPI UI</h2>
+        <form id="setForm">
+            <input type="text" id="key" placeholder="Enter key" required>
+            <input type="text" id="value" placeholder="Enter value" required>
+            <input type="submit" value="Set Data">
+        </form>
+
+        <div class="data-container">
+            <h3>Stored Data</h3>
+            <div id="dataDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('setForm');
+        const dataDisplay = document.getElementById('dataDisplay');
+
+        // Function to fetch and display data
+        async function fetchData() {
+            const response = await fetch('http://127.0.0.1:8000/data/get/');
+            const data = await response.json();
+            dataDisplay.innerHTML = ''; // Clear previous data
+            data.data.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('data-item');
+                itemDiv.innerText = JSON.stringify(item);
+                dataDisplay.appendChild(itemDiv);
+            });
+        }
+
+        // Initial data fetch
+        fetchData();
+
+        // Handle form submission
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const key = document.getElementById('key').value;
+            const value = document.getElementById('value').value;
+
+            const response = await fetch('http://127.0.0.1:8000/data/set/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ key: key, value: value }),
+            });
+
+            if (response.ok) {
+                alert('Data set successfully!');
+                form.reset();
+                fetchData(); // Refresh data display
+            } else {
+                alert('Failed to set data.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Stage 1: Build
+FROM python:3.11-slim as build
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code
+COPY . .
+
+# Stage 2: Final
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set working directory
+WORKDIR /app
+
+# Copy installed dependencies from the build stage
+COPY --from=build /app /app
+
+# Expose the port FastAPI is running on
+EXPOSE 8000
+
+# Run the FastAPI application
+CMD ["uvicorn", "script_name:app", "--host", "0.0.0.0", "--port", "8000"]
