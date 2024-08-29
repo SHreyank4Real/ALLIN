@@ -1,0 +1,21 @@
+name: Build Images
+
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches: 
+      [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: List and Read files
+        run: |
+              ls -ltra
+              cat README.md
