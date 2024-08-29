@@ -3,7 +3,10 @@ name: Build Images
 on:
   push:
     branches: 
-      - '**'
+      - '**'    # matches every branch
+      - '*/*'   # matches every branch containing a single '/'
+      - '*'     # matches every branch
+#      - '!master' # excludes master
   pull_request:
     branches: 
       [ "main" ]

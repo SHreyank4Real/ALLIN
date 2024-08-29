@@ -5,9 +5,19 @@ from pymongo import MongoClient
 from bson import ObjectId
 import redis
 import datetime
+import os
 
 current_datetime = datetime.datetime.now()
 timestamp = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'dummy')
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', 'dummy')
+MONGODB_HOST = os.environ.get('MONGODB_HOST', 'dummy')
+MONGODB_USERNAME = os.environ.get('MONGODB_USERNAME', 'dummy')
+MONGODB_PASSWORD = os.environ.get('MONGODB_PASSWORD', 'dummy')
+MONOGODB_DBNAME = os.environ.get('MONOGODB_DBNAME', 'dummy')
+MONOGODB_COLLECTION = os.environ.get('MONOGODB_COLLECTION', 'dummy')
+
 
 app = FastAPI()
 
@@ -23,11 +33,11 @@ app.add_middleware(
 KEYPREFIX="user:"
 KEYSUFIX=":auth"
 
-redis_client = redis.StrictRedis(host="localhost", port="6380" ,password='', charset="utf-8", decode_responses=True)
+redis_client = redis.StrictRedis(host=REDIS_HOST, port="6380" ,password=REDIS_PASSWORD, charset="utf-8", decode_responses=True)
 
-client = MongoClient('mongodb://<username>:<password>@localhost:27017/')
-db = client['mydatabase']
-collection = db['mycollection']
+client = MongoClient('mongodb://'+MONGODB_USERNAME+':'+MONGODB_PASSWORD+'@'+MONGODB_HOST+':27017/')
+db = client[MONOGODB_DBNAME]
+collection = db[MONOGODB_COLLECTION]
 
 class Item(BaseModel):
     key: str
