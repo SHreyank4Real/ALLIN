@@ -33,7 +33,7 @@ app.add_middleware(
 KEYPREFIX="user:"
 KEYSUFIX=":auth"
 
-redis_client = redis.StrictRedis(host=REDIS_HOST, port="6380" ,password=REDIS_PASSWORD, charset="utf-8", decode_responses=True)
+redis_client = redis.StrictRedis(host=REDIS_HOST, port="6379" ,password=REDIS_PASSWORD, charset="utf-8", decode_responses=True)
 
 client = MongoClient('mongodb://'+MONGODB_USERNAME+':'+MONGODB_PASSWORD+'@'+MONGODB_HOST+':27017/')
 db = client[MONOGODB_DBNAME]
@@ -61,6 +61,8 @@ async def get_data():
     for item in data:
         item["_id"] = str(item["_id"])
     return {"data": data}
+
+
 
 @app.post("/get/auth/")
 async def get_password(user: User):
