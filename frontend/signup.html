@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Signup</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,76 +30,57 @@
             border: 1px solid #ddd;
         }
         input[type="submit"] {
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
         }
         input[type="submit"]:hover {
-            background-color: #218838;
-        }
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        .signup-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .signup-button:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login</h2>
-        <form id="loginForm">
+        <h2>Signup</h2>
+        <form id="signupForm">
+            <input type="text" id="fullName" placeholder="Full Name" required>
             <input type="text" id="username" placeholder="Username" required>
             <input type="password" id="password" placeholder="Password" required>
-            <div class="button-container">
-                <input type="submit" value="Login">
-                <button type="button" class="signup-button" id="signUpButton">Sign Up</button>
-            </div>
+            <input type="submit" value="Signup">
         </form>
-        <input type="submit" id="resetPasswordButton" value="Reset Password">
         <div id="error" style="color: red; display: none;"></div>
+        <div id="success" style="color: green; display: none;"></div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+        document.getElementById('signupForm').addEventListener('submit', async function(event) {
             event.preventDefault();
+            const fullName = document.getElementById('fullName').value;
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            const response = await fetch('http://127.0.0.1:8000/get/auth/', {
+            const response = await fetch('http://127.0.0.1:8000/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ fullName, username, password }),
             });
 
             if (response.ok) {
-                localStorage.setItem('token', 'dummy_token');
-                window.location.href = 'main.html'; 
+                document.getElementById('success').innerText = 'Signup successful! Redirecting to login page...';
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
             } else {
-                document.getElementById('error').innerText = 'Invalid username or password';
+                const errorData = await response.json();
+                document.getElementById('error').innerText = errorData.message || 'Signup failed. Try again.';
                 document.getElementById('error').style.display = 'block';
+                document.getElementById('success').style.display = 'none';
             }
-        });
-
-        document.getElementById('signUpButton').addEventListener('click', function() {
-            window.location.href = 'signup.html';
-        });
-
-        document.getElementById('resetPasswordButton').addEventListener('click', function(event) {
-            event.preventDefault();
-            window.location.href = 'password-reset.html';
         });
     </script>
 </body>
