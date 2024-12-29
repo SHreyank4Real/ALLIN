@@ -47,6 +47,12 @@ class User(BaseModel):
     username: str
     password: str
 
+class PassUser(BaseModel):
+    username: str
+    old_password: str
+    new_password1: str
+    new_password2: str
+
 @app.post("/data/set/")
 async def set_data(item: Item):
     document = {item.key: item.value}
@@ -72,4 +78,28 @@ async def get_password(user: User):
         return {"access_token": "dummy_token", "token_type": "bearer"}
     raise HTTPException(status_code=401, detail="Invalid username or password")
 
-#TODO use variabels and make applicaion fault tolerant
+@app.post("/register/")
+async def signup(user: User):
+    USERKEY = KEYPREFIX+str(user.username)+KEYSUFIX
+    result = redis_client.set(USERKEY,user.password)
+    if result == 1:
+        return {"message": "User registered successfully"}
+    raise HTTPException(status_code=401, detail="Failed signup, try again!!")
+
+@app.post("/auth/reset")
+async def reset_password(user: PassUser):
+    USERKEY = KEYPREFIX + str(user.username) + KEYSUFIX
+    
+    if not redis_client.exists(USERKEY):
+        raise HTTPException(status_code=404, detail="User not found")
+
+    stored_password = redis_client.get(USERKEY)
+    if stored_password != user.old_password:
+        raise HTTPException(status_code=401, detail="Old password is incorrect")
+
+    if user.new_password1 != user.new_password2:
+        raise HTTPException(status_code=400, detail="New passwords do not match")
+    
+    redis_client.set(USERKEY, user.new_password1)
+
+    return {"message": "Password reset successfully"}

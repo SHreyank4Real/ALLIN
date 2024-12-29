@@ -16,5 +16,13 @@ COPY . /app
 # Expose the port the app runs on
 EXPOSE 8000
 
+ENV MONGODB_USERNAME="admin"
+ENV MONGODB_PASSWORD="adminpass"
+ENV MONGODB_HOST="mongo"
+ENV MONOGODB_DBNAME="mydatabase"
+ENV MONOGODB_COLLECTION="mycollection"
+ENV REDIS_HOST="redis"
+ENV REDIS_PASSWORD=""
+
 # Command to run the FastAPI app with uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
